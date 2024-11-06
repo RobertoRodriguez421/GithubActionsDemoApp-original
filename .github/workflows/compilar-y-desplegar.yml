@@ -2,7 +2,7 @@ name: Compilar y desplegar
 
 on: 
   workflow_dispatch:
-  push:
+  push: 
     paths:
       - ".github/workflows/compilar-y-desplegar.yml" 
       - "GithubActionsDemoApp/**" 
