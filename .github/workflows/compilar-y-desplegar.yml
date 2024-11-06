@@ -1,0 +1,57 @@
+name: Compilar y desplegar
+
+on: 
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/paths.yml"
+      - "GithubActionsDemoApp/**"
+      - "Pruebas/**"
+    branches:
+      main
+
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    env:
+      proyecto: GithubActionsDemoApp/GithubActionsDemoApp.csproj
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obteniendo el codigo
+        uses: actions/checkout@v4.2.2
+
+      - name: Instalar .NET
+        uses: actions/setup-dotnet@v4.1.0 #nombre: Setup .NET Core SDK
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Obteniendo las dependencias
+        run: dotnet restore
+
+      - name: Compilar
+        run: dotnet build --no-restore
+
+      - name: Realizar pruebas
+        run: dotnet test --no-build 
+
+      - name: dotnet publish
+        run: dotnet publish $proyecto -c Release -o myapp --runtime win-x86
+
+      - uses: actions/upload-artifact@v4.4.3
+        with:
+          path: ./myapp
+          name: build
+
+      - name: Zip
+        if: startsWith(github.ref, 'refs/tags/')
+        run: zip -r mi_app.zip ./myapp
+
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ./mi_app.zip
+          body: "Nuestra aplicacion"
+          tag_name: ${{ github.ref_name }}
+
