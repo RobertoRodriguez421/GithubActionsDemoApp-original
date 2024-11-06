@@ -6,7 +6,7 @@ on:
     paths:
       - ".github/workflows/compilar-y-desplegar.yml" 
       - "GithubActionsDemoApp/**" 
-      - "Pruebas/**"
+      - "Pruebas/**" 
     branches:
       main
 
